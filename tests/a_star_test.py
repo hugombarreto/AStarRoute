@@ -10,7 +10,6 @@ class GraphGenerator(object):
     @staticmethod
     def get_random_grid(x, y):
         generate_barriers = np.vectorize(lambda i: np.inf if i < GraphGenerator.barrier_probability else np.rint(i*1000)+1)
-        # generate_barriers = np.vectorize(lambda i: int(i < GraphGenerator.barrier_probability))
         grid_array = generate_barriers(np.random.rand(x, y))
         start = (np.random.random_integers(0, x - 1), np.random.random_integers(0, y - 1))
         finish = (np.random.random_integers(0, x - 1), np.random.random_integers(0, y - 1))
