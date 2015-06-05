@@ -24,7 +24,8 @@ class PriorityQueue(object):
 
 
 class Node(object):
-    """This class is used to make sure the nodes are ordered based on the priority only"""
+    """Used to make the nodes ordered based on the priority only
+    """
 
     def __init__(self, node_id, priority=None):
         self._id = node_id
@@ -95,14 +96,17 @@ class Graph(object):
             current_node_info = nodes_info[current_node_id]
             current_node_info.closed = True
 
-            for adj_node_id, adj_node_to_parent_weight in self._get_neighbor_weight_list(current_node_id):
-                adj_node_info = nodes_info[adj_node_id] if adj_node_id in nodes_info else self.NodeInfo()
+            for adj_node_id, adj_node_to_parent_weight in \
+                    self._get_neighbor_weight_list(current_node_id):
+                adj_node_info = nodes_info[adj_node_id] if \
+                    adj_node_id in nodes_info else self.NodeInfo()
 
                 if not adj_node_info.closed:
                     g = current_node_info.g + adj_node_to_parent_weight
                     if adj_node_id not in nodes_info or g < adj_node_info.g:
                         adj_node_info.parent = current_node_id
-                        h = self._calculate_heuristic_cost(adj_node_id, target.get_id())
+                        h = self._calculate_heuristic_cost(adj_node_id,
+                                                           target.get_id())
                         adj_node_info.g = g
                         adj_node_info.f = g + h
                         open_list.push(Node(adj_node_id, adj_node_info.f))
@@ -119,7 +123,8 @@ class Graph(object):
         while file_name in files_in_directory:
             file_name = file_prefix + str(file_counter) + ".p"
             file_counter += 1
-        pickle.dump((self, start_node, end_node), open(directory + file_name, "wb"))
+        pickle.dump((self, start_node, end_node),
+                    open(directory + file_name, "wb"))
         print "saved"
 
     def _calculate_heuristic_cost(self, current_node_id, target_node_id):
@@ -142,9 +147,14 @@ class BaseGrid(Graph):
         self.identity_matrix = np.eye(len(self.grid_shape), dtype=int)
 
     def _get_neighbors(self, grid, node_position):
-        no_filter_neighbors = list(np.concatenate((node_position - self.identity_matrix,
-                                                   node_position + self.identity_matrix)))
-        neighbors = filter(lambda i: np.logical_and((i >= 0), (i < self.grid_shape)).all(), no_filter_neighbors)
+        no_filter_neighbors = list(np.concatenate(
+            (node_position - self.identity_matrix,
+             node_position + self.identity_matrix)))
+
+        neighbors = filter(
+            lambda i: np.logical_and((i >= 0), (i < self.grid_shape)).all(),
+            no_filter_neighbors)
+
         weighted_neighbors = []
         for n in neighbors:
             tuple_n = tuple(n)
@@ -155,7 +165,8 @@ class BaseGrid(Graph):
 
     def _calculate_heuristic_cost(self, current_node_id, target_node_id):
         # Using 1-norm
-        return self._calculate_p_norm(1, np.array(current_node_id) - np.array(target_node_id))
+        return self._calculate_p_norm(1, np.array(current_node_id) -
+                                      np.array(target_node_id))
 
     def _calculate_p_norm(self, p, vector):
         return sum(abs(vector)**p)**(1./p)
@@ -167,16 +178,18 @@ class GridAsGraph(BaseGrid):
     def __init__(self, grid):
         """
         Args:
-          grid (numpy.array): The any dimensions grid to be converted and used as a graph, the barriers
-            are represented by `numpy.inf`
+          grid (numpy.array): The any dimensions grid to be converted
+            and used as a graph, the barriers are represented by `numpy.inf`
         """
         super(GridAsGraph, self).__init__(grid)
 
         it = np.nditer(grid, flags=['multi_index'])
         while not it.finished:
             if it[0] != 1:
-                for neighbor, weight in self._get_neighbors(grid, it.multi_index):
-                    self.insert_edge(Node(it.multi_index), Node(tuple(neighbor)), 1)
+                neighbors = self._get_neighbors(grid, it.multi_index)
+                for neigh, weight in neighbors:
+                    edge = (Node(it.multi_index), Node(tuple(neigh)), weight)
+                    self.insert_edge(*edge)
             it.iternext()
         print "ready!"
 
@@ -186,8 +199,8 @@ class GridAsArray(BaseGrid):
     def __init__(self, grid):
         """
         Args:
-          grid (numpy.array): The any dimensions grid to be used for the A* algorithm, the barriers
-            are represented by `numpy.inf`
+          grid (numpy.array): The any dimensions grid to be used for the
+            A* algorithm, the barriers are represented by `numpy.inf`
         """
         super(GridAsArray, self).__init__(grid)
         self._grid = grid

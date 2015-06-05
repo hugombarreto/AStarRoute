@@ -26,12 +26,16 @@ def compute_path(grid, start, finish, show_try_path=False):
 def set_screen(window_size, grid_size, margin):
     grid_tile_width = ((window_size[0] - margin) / grid_size[0]) - margin
     grid_tile_height = ((window_size[1] - margin) / grid_size[1]) - margin
-    screen = pygame.display.set_mode(window_size, pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.RESIZABLE)
+    screen = pygame.display.set_mode(window_size, pygame.HWSURFACE |
+                                     pygame.DOUBLEBUF | pygame.RESIZABLE)
 
     return screen, grid_tile_width, grid_tile_height
 
+
 def get_numpy_grid_from_list_grid(list_grid):
-    return np.array(map(lambda column: map(lambda i: np.inf if i == 1 else 1, column), list_grid))
+    return np.array(map(lambda column: map(lambda i: np.inf if i == 1 else 1,
+                                           column), list_grid))
+
 
 def main():
     # colors
@@ -54,7 +58,8 @@ def main():
     window_size = (1000, 1000)
     grid_size = (100, 100)
 
-    screen, grid_tile_width, grid_tile_height = set_screen(window_size, grid_size, margin)
+    screen, grid_tile_width, grid_tile_height = set_screen(window_size,
+                                                           grid_size, margin)
 
     grid = [[0] * grid_size[1] for i in xrange(grid_size[0])]
     changes_grid = [[False] * grid_size[1] for i in xrange(grid_size[0])]
@@ -77,7 +82,8 @@ def main():
             elif event.type == pygame.VIDEORESIZE:
                 mouse_pressed = False
                 window_size = event.dict['size']
-                screen, grid_tile_width, grid_tile_height = set_screen(window_size, grid_size, margin)
+                screen, grid_tile_width, grid_tile_height = \
+                    set_screen(window_size, grid_size, margin)
                 screen_modf = True
 
             if event.type == pygame.KEYDOWN:
@@ -87,15 +93,19 @@ def main():
                         screen_modf = True
                 if event.key == pygame.K_c:
                     grid = [[0] * grid_size[1] for i in xrange(grid_size[0])]
-                    changes_grid = [[False] * grid_size[1] for i in xrange(grid_size[0])]
+                    changes_grid = [[False] * grid_size[1] for i in
+                                    xrange(grid_size[0])]
                     done = False
                     mouse_pressed = False
                     screen_modf = True
                     user_set_start = False
                     start_tile = None
                     end_tile = None
-                if event.key == pygame.K_s and (start_tile and end_tile) is not None:
-                    Grid(get_numpy_grid_from_list_grid(grid)).save("grid", "../tests/boards/", start_tile, end_tile)
+                if ((event.key == pygame.K_s) and
+                   ((start_tile and end_tile) is not None)):
+                    grid_object = Grid(get_numpy_grid_from_list_grid(grid))
+                    grid_object.save("grid", "../tests/boards/",
+                                     start_tile, end_tile)
 
             if event.type == pygame.MOUSEMOTION and mouse_pressed:
                 pos = pygame.mouse.get_pos()
@@ -141,16 +151,19 @@ def main():
 
             if event.type == pygame.MOUSEBUTTONUP:
                 mouse_pressed = False
-                changes_grid = [[False] * grid_size[1] for i in xrange(grid_size[0])]
+                changes_grid = [[False] * grid_size[1] for i in
+                                xrange(grid_size[0])]
 
         if screen_modf:
             screen.fill(background_color)
             for x, row in enumerate(grid):
                 for y, v in enumerate(row):
-                    color = [tile_color_blank, tile_color_filled, start_color, finish_color, path_color, try_color][v]
-                    pygame.draw.rect(screen, color, [(margin + grid_tile_width) * y + margin,
-                                                     (margin + grid_tile_height) * x + margin,
-                                                     grid_tile_width, grid_tile_height])
+                    color = [tile_color_blank, tile_color_filled, start_color,
+                             finish_color, path_color, try_color][v]
+                    pygame.draw.rect(screen, color,
+                                     [(margin + grid_tile_width) * y + margin,
+                                      (margin + grid_tile_height) * x + margin,
+                                      grid_tile_width, grid_tile_height])
 
             pygame.display.flip()
             screen_modf = False
