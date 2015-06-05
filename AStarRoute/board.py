@@ -2,7 +2,7 @@ import pygame
 import numpy as np
 from a_star import Grid, Node
 
-@profile
+
 def compute_path(grid, start, finish, show_try_path=False):
     graph_grid = Grid(get_numpy_grid_from_list_grid(grid))
     path_trace = graph_grid.a_star(Node(start), Node(finish))
